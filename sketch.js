@@ -189,15 +189,15 @@ class Bubble {
   draw() {
     push();
     translate(this.x, this.y);
-    noFill();
-    stroke(255, 180); // 帶透明度的白色邊緣
-    strokeWeight(2);
+    fill(255, 50);    // 微白且高度透明的泡泡主體
+    stroke(255, 200); // 帶透明度的白色邊緣
+    strokeWeight(1.5);
     circle(0, 0, this.r * 2);
     
     // 畫一個小小的白色反光，讓它看起來更有水泡立體感
     noStroke();
-    fill(255, 200);
-    ellipse(-this.r * 0.3, -this.r * 0.3, this.r * 0.4, this.r * 0.4);
+    fill(255, 220);
+    ellipse(-this.r * 0.4, -this.r * 0.4, this.r * 0.5, this.r * 0.5);
     pop();
   }
 }
