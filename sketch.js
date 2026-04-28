@@ -6,7 +6,7 @@ let handPose;
 let hands = [];
 let statusMsg = "模型載入中...";
 let isWebGLSupported = true;
-let petals = []; // 儲存花瓣物件的陣列
+let bubbles = []; // 儲存泡泡物件的陣列
 
 function preload() {
   // 檢查手機或瀏覽器是否支援 WebGL
@@ -64,7 +64,7 @@ function draw() {
   // 若不支援 WebGL 或模型載入失敗，將訊息顯示於畫面中央並停止後續渲染
   if (!isWebGLSupported || !handPose) {
     push();
-    fill(255, 0, 0); // 設定文字為紅色
+    fill(220, 20, 60); // 更改為較不刺眼的 Crimson 紅色
     textSize(24);
     textAlign(CENTER, CENTER);
     text(statusMsg, width / 2, height / 2);
@@ -127,81 +127,77 @@ function draw() {
           circle(keypoint.x, keypoint.y, 16);
         }
 
-        // 在指尖 (4, 8, 12, 16, 20) 產生紫色花瓣
-        if (frameCount % 2 === 0) { // 稍微控制花瓣產生的頻率避免效能過載
+        // 在指尖 (4, 8, 12, 16, 20) 產生透明泡泡
+        if (frameCount % 2 === 0) { // 稍微控制泡泡產生的頻率避免效能過載
           let tips = [4, 8, 12, 16, 20];
           for (let tipIdx of tips) {
             let pt = hand.keypoints[tipIdx];
-            petals.push(new Petal(pt.x, pt.y));
+            bubbles.push(new Bubble(pt.x, pt.y));
           }
         }
       }
     }
   }
 
-  // 更新與繪製所有花瓣 (保持在畫布縮放與位移的座標系中)
-  for (let i = petals.length - 1; i >= 0; i--) {
-    petals[i].update();
-    petals[i].draw();
-    if (petals[i].life <= 0) {
-      petals.splice(i, 1);
+  // 更新與繪製所有泡泡 (保持在畫布縮放與位移的座標系中)
+  for (let i = bubbles.length - 1; i >= 0; i--) {
+    bubbles[i].update();
+    bubbles[i].draw();
+    if (bubbles[i].life <= 0) {
+      bubbles.splice(i, 1);
     }
   }
   pop();
 
   // 在畫面上方顯示模型載入成功的訊息
   push();
-  fill(0, 150, 0); // 設定文字為綠色
+  fill(30, 144, 255); // 更改為較柔和好看的 DodgerBlue 藍色
   textSize(24);
   textAlign(CENTER, TOP);
   text(statusMsg, width / 2, 20);
   pop();
 
-  // 在畫布左上方加上指定的文字
+  // 將文字放置於中間視訊視窗的下方
   push();
-  fill(0); // 黑色文字
+  fill(50); // 深灰色文字
   textSize(24);
-  textAlign(LEFT, TOP);
-  text("414730233林子靖文字", 20, 20);
+  textAlign(CENTER, TOP);
+  text("414730233林子靖", width / 2, drawY + drawH + 20);
   pop();
 }
 
-// 定義花瓣的類別
-class Petal {
+// 定義泡泡的類別
+class Bubble {
   constructor(x, y) {
     this.x = x;
     this.y = y;
     this.vx = random(-0.5, 0.5);
     this.vy = random(-2, -5); // 初始往上串升
-    this.life = 255;
+    this.r = random(5, 12);   // 泡泡半徑大小
+    this.life = 1;            // 存活狀態 (大於 0 代表存在)
     this.age = 0;
-    this.scatterTime = random(30, 60); // 經過多少幀後開始散開
-    this.angle = random(TWO_PI);
+    this.popTime = random(30, 80); // 經過多少幀後泡泡自動破掉
   }
   update() {
     this.age++;
-    if (this.age > this.scatterTime) {
-      // 到達適當位置時自動散開：增加混亂的水平及垂直速度
-      this.vx += random(-0.8, 0.8);
-      this.vy += random(-0.5, 0.5);
+    if (this.age > this.popTime) {
+      this.life = 0; // 到達設定的時間後直接破掉 (被陣列移除)
     }
     this.x += this.vx;
     this.y += this.vy;
-    this.angle += 0.05; // 旋轉效果
-    this.life -= 2;     // 隨時間逐漸變透明
   }
   draw() {
     push();
     translate(this.x, this.y);
-    rotate(this.angle);
+    noFill();
+    stroke(255, 180); // 帶透明度的白色邊緣
+    strokeWeight(2);
+    circle(0, 0, this.r * 2);
+    
+    // 畫一個小小的白色反光，讓它看起來更有水泡立體感
     noStroke();
-    fill(180, 50, 255, this.life); // 紫色帶透明度
-    // 利用貝茲曲線繪製花瓣形狀
-    beginShape();
-    vertex(0, -10);
-    bezierVertex(10, -10, 10, 10, 0, 15);
-    bezierVertex(-10, 10, -10, -10, 0, -10);
-    endShape(CLOSE);
+    fill(255, 200);
+    ellipse(-this.r * 0.3, -this.r * 0.3, this.r * 0.4, this.r * 0.4);
     pop();
   }
 }
