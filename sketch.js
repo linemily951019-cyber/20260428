@@ -171,12 +171,12 @@ class Bubble {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.vx = random(-0.5, 0.5);
-    this.vy = random(-2, -5); // 初始往上串升
+    this.vx = random(-0.3, 0.3); // 減緩水平飄移速度
+    this.vy = random(-1, -2.5);  // 減緩往上升的速度
     this.r = random(5, 12);   // 泡泡半徑大小
     this.life = 1;            // 存活狀態 (大於 0 代表存在)
     this.age = 0;
-    this.popTime = random(30, 80); // 經過多少幀後泡泡自動破掉
+    this.popTime = random(50, 100); // 配合速度調慢，延長泡泡的存在時間
   }
   update() {
     this.age++;
@@ -194,10 +194,12 @@ class Bubble {
     strokeWeight(1.5);
     circle(0, 0, this.r * 2);
     
-    // 畫一個小小的白色反光，讓它看起來更有水泡立體感
-    noStroke();
-    fill(255, 220);
-    ellipse(-this.r * 0.4, -this.r * 0.4, this.r * 0.5, this.r * 0.5);
+    // 畫一條白色的弧線反光，取代原本的小圓點
+    noFill();
+    stroke(255, 220);
+    strokeWeight(this.r * 0.3); // 反光線的粗細根據泡泡大小調整
+    strokeCap(ROUND); // 讓線條兩端呈現圓潤感
+    arc(0, 0, this.r * 1.4, this.r * 1.4, PI + 0.2, PI + HALF_PI - 0.2); // 在左上角畫一小段弧線
     pop();
   }
 }
