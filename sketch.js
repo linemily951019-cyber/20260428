@@ -18,7 +18,7 @@ function preload() {
 
   if (!gl) {
     isWebGLSupported = false;
-    statusMsg = "很抱歉 您的手機不支援WebGL";
+    statusMsg = "很抱歉 您的瀏覽器不支援WebGL";
   } else {
     try {
       // Initialize HandPose model with flipped video input
